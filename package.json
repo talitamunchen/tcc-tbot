@@ -1,0 +1,20 @@
+{
+  "name": "tcc-talita",
+  "version": "1.0.0",
+  "description": "Trader bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://talitamunchen@bitbucket.org/talitamunchen/tcc-talita.git"
+  },
+  "author": "Talita München",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/talitamunchen/tcc-talita#readme",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "request": "^2.88.0"
+  }
+}
