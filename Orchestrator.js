@@ -2,7 +2,8 @@
 // N opera vendido, somente comprado
 // Meio de campo com o CHATBOT
 
-const Gateway = require('./gateways/MBGateway');
+const Gateway = require('./app-modules/MBGateway');
+const APIInterface = require('./app-modules/APIInterface');
 
 const Orchestrator = function () {
 

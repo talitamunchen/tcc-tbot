@@ -30,7 +30,7 @@ const Gateway = function(orchestrator) {
 		setTimeout(function() {
 			self.requestPrice();
 		}, process.env.GATEWAY_TICKER_UPDATE_INTERVAL);
-	}
+	};
 
 };
 
