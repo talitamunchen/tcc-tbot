@@ -1,3 +1,6 @@
+// Responsavel por requisitar os valores da URL
+// Atualizacao de precos;posicao;lista de ordens pendentes
+// Ordem de stop;compra;venda;cancelamento
 const request = require("request");
 
 const Gateway = function(orchestrator) {

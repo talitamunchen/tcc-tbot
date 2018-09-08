@@ -1,3 +1,7 @@
+// Recebe as info do mercado e entao faz o processamento dos pedidos (verifica quando é melhor comprar/vender)
+// N opera vendido, somente comprado
+// Meio de campo com o CHATBOT
+
 const Gateway = require('./gateways/MBGateway');
 
 const Orchestrator = function () {
