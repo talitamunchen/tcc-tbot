@@ -22,16 +22,19 @@ const AnalysisMachine = function (orquestrator) {
 		this.gateway = new Gateway(this);
 		this.gateway.setupPriceUpdater();
     }
-    
-    this.gambi = function (){
-        const fakePrices = [1, 2, 3, 4, 6, 8, 9, 11, 13, 3, 5, 6, 7, 8, 9, 20];
-        fakePrices.forEach(p => {
-            this.priceUpdated(p);
-        });
-    }
 
     this.installIndicator = function (indicator){
         this.indicators.push(indicator);
+    }
+
+    this.fakePrice = function (arr) {
+        const self = this;
+        this.priceUpdated(arr.shift());
+        if (arr.length > 0){
+            setTimeout(() => {
+                self.fakePrice(arr);
+            }, 1000);
+        }
     }
 };
 

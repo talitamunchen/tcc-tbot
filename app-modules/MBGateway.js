@@ -4,10 +4,9 @@
 const request = require("request");
 const APIInterface = require("./APIInterface");
 
-const Gateway = function(orchestrator) {
+const Gateway = function() {
 
 	this.REQUEST_PRICE_URL = `https://www.mercadobitcoin.net/api/${process.env.COIN}/ticker/`;
-	this.orchestrator = orchestrator;
 
 	this.requestPrice = function(analysisMachine) {
 		const self = this;
@@ -19,9 +18,11 @@ const Gateway = function(orchestrator) {
 				console.log(`Erro ao carregar dados de preco: ${err}`);
 			}else{
 				const parsedBody = JSON.parse(body);
-				analysisMachine.priceUpdated(parsedBody.ticker.last);
+				const price = Number(parsedBody.ticker.last);
+				console.log(`New price = ${price}`);
+				analysisMachine.priceUpdated(price);
 			}
-			self.setupPriceUpdater();
+			self.setupPriceUpdater(analysisMachine);
 		});
 	};
 

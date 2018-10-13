@@ -10,8 +10,12 @@ o.init();
 
 const AnalysisMachine = require('./app-modules/AnalysisMachine');
 const SimpleMovingAverage = require('./app-modules/indicators/SimpleMovingAverage');
+const MBGateway = require('./app-modules/MBGateway');
 
-const a = new AnalysisMachine();
-a.installIndicator(new SimpleMovingAverage(6, 2));
-a.gambi();
+const analysisMachine = new AnalysisMachine();
+analysisMachine.installIndicator(new SimpleMovingAverage(6, 2));
+analysisMachine.fakePrice([1, 2, 3, 4, 6, 8, 9, 11, 13, 3, 5, 6, 7, 8, 9, 20]);
+
+const mbGateway = new MBGateway();
+//mbGateway.setupPriceUpdater(analysisMachine);
 
