@@ -47,7 +47,15 @@ const Orchestrator = function () {
 			const limitiPrice = price * Number(process.env.BUY_SPREAD_MARGIN);
 			const quantity = Number(((Math.floor((balance/limitiPrice) * 1000000)) / 1000000).toFixed(6));
 
-			console.log(`Buying ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
+			//console.log(`Buying ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
+			
+			this.sendRequestForTrade({
+				signal: process.env.SIGNAL_BUY,
+				coinPair: coinPair,
+				quantity: quantity,
+				limitiPrice: limitiPrice
+				//graphic
+			});
 		});
 	}
 
@@ -61,8 +69,20 @@ const Orchestrator = function () {
 			const coinPair = `BRL${process.env.COIN}`;
 			const limitiPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
 
-			console.log(`Selling ${balance} ${coinPair} at ${limitiPrice}`);
+			//console.log(`Selling ${balance} ${coinPair} at ${limitiPrice} for a total of ${(balance*limitiPrice).toFixed(2)}`);
+			
+			this.sendRequestForTrade({
+				signal: process.env.SIGNAL_SELL,
+				coinPair: coinPair,
+				quantity: quantity,
+				limitiPrice: limitiPrice
+				//graphic
+			});
 		});
+	}
+
+	this.sendRequestForTrade = function (order) {
+		console.log(JSON.stringify(order, null, 4));
 	}
 };
 
