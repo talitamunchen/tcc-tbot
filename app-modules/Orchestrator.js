@@ -9,6 +9,8 @@ const MBGateway = require('./MBGateway');
 //mbGateway.setupPriceUpdater(analysisMachine);
 
 const Orchestrator = function () {
+	this.blocked = false;
+
 	this.init = function () {
 		this.gateway = new MBGateway(this);
 		this.analysisMachine = new AnalysisMachine(this);
@@ -19,11 +21,48 @@ const Orchestrator = function () {
 	}
 
 	this.onSignal = function (signal, price) {
-		if (signal > 0){
-			return console.log(`Compra = ${price}`);
-		}else{
-			return console.log(`Vende = ${price}`);
+		if (this.blocked){
+			return console.log(`Blocked, will not execute ${signal == process.env.SIGNAL_BUY ? "buy":"sell"}`);
 		}
+		//this.blocked = true;
+		if (signal == process.env.SIGNAL_BUY){
+			this.buyOrderChain(price);
+		}else{
+			this.sellOrderChain(price);
+		}
+	}
+
+	this.releaseBlock = function () {
+		this.blocked = false;
+	}
+
+	this.buyOrderChain = function (price) {
+		this.gateway.getBalance(function (err, data){
+			if (err){
+				console.log(`Error creating buy chain ${err}: ${JSON.stringify(err)}`);
+			}
+			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
+			const balance = Number(Number(data.response_data.balance.brl.available).toFixed(2));
+			const coinPair = `BRL${process.env.COIN}`;
+			const limitiPrice = price * Number(process.env.BUY_SPREAD_MARGIN);
+			const quantity = Number(((Math.floor((balance/limitiPrice) * 1000000)) / 1000000).toFixed(6));
+
+			console.log(`Buying ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
+		});
+	}
+
+	this.sellOrderChain = function (price) {
+		this.gateway.getBalance(function (err, data){
+			if (err){
+				console.log(`Error creating sell chain ${err}: ${JSON.stringify(err)}`);
+			}
+			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
+			const balance = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available);
+			const coinPair = `BRL${process.env.COIN}`;
+			const limitiPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
+
+			console.log(`Selling ${balance} ${coinPair} at ${limitiPrice}`);
+		});
 	}
 };
 

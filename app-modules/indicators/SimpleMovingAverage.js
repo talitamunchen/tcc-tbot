@@ -21,8 +21,8 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
         const trendAverage = this.calcAverage(this.prices); //tendencia
         const signalAverage = this.calcAverage(signalPrices); //sinal
 
-        console.log(`${JSON.stringify(this.prices)} - ${JSON.stringify(signalPrices)}`);
-        console.log(`${trendAverage} - ${signalAverage}`);
+        //console.log(`${JSON.stringify(this.prices)} - ${JSON.stringify(signalPrices)}`);
+        //console.log(`${trendAverage} - ${signalAverage}`);
 
         if (trendAverage == signalAverage){
             return null; //nenhum sinal
