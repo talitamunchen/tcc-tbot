@@ -9,7 +9,8 @@ const DataCache     = require(`./DataCache`);
 
 let APIInterface = {
 
-postToMB : function(form, retry = 1, callback) {
+postToMB : function(form, callback) {
+		let retry = 3;
 		DataCache.nextMBNonce(function(err, nonce) {
 			if (err){
 				return callback(err);
