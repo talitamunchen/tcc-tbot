@@ -41,9 +41,30 @@ const Gateway = function(orchestrator) {
 		APIInterface.postToMB(form, callback);
 	};
 
+	this.getOrder = function(coinPair, orderId, callback) {
+		const form = {
+			'tapi_method': 'get_order',
+			'coin_pair': coinPair,
+			'order_id': orderId
+		};
+
+		APIInterface.postToMB(form, callback);
+	};
+
 	this.createBuyOrder = function(coinPair, quantity, limitPrice, callback) {
 		const form = {
 			'tapi_method': 'place_buy_order',
+			'coin_pair': coinPair,
+			'quantity': quantity,
+			'limit_price': limitPrice
+		};
+
+		APIInterface.postToMB(form, callback);
+	};
+
+	this.createSellOrder = function(coinPair, quantity, limitPrice, callback) {
+		const form = {
+			'tapi_method': 'place_sell_order',
 			'coin_pair': coinPair,
 			'quantity': quantity,
 			'limit_price': limitPrice

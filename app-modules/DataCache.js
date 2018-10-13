@@ -8,7 +8,6 @@ let DataCache = {
 			DataCache.nonce = fs.readFileSync('.cache', 'utf8');
 		}
 		const nonce = DataCache.nonce ++;
-		console.log(DataCache.nonce);
 		fs.writeFile('.cache', DataCache.nonce, 'utf8', callback);
 	}
 };
