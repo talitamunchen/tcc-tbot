@@ -1,19 +1,16 @@
+//Maquina de analise
 const AnalysisMachine = function (orquestrator) {
 
     this.orquestrator = orquestrator;
     this.indicators = [];
     
     this.priceUpdated = function (price) {
+        console.log(`New price = ${price}`);
         for(let i = 0; i < this.indicators.length; i++){
             const indicator = this.indicators[i];
             const signal = indicator.indicatorSignal(price);
             if (signal){
-                if (signal > 0){
-                    return console.log(`Compra = ${price}`);
-                }else{
-                    return console.log(`Vende = ${price}`);
-                }
-               // return this.orquestrator.onSignal(signal);
+               return this.orquestrator.onSignal(signal, price);
             }
         }
 	}

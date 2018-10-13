@@ -19,7 +19,6 @@ const Gateway = function() {
 			}else{
 				const parsedBody = JSON.parse(body);
 				const price = Number(parsedBody.ticker.last);
-				console.log(`New price = ${price}`);
 				analysisMachine.priceUpdated(price);
 			}
 			self.setupPriceUpdater(analysisMachine);
