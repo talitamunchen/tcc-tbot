@@ -5,6 +5,7 @@
 const AnalysisMachine = require('./AnalysisMachine');
 const SimpleMovingAverage = require('./indicators/SimpleMovingAverage');
 const MBGateway = require('./MBGateway');
+const BotInterface = require('./BotInterface');
 
 //mbGateway.setupPriceUpdater(analysisMachine);
 
@@ -12,11 +13,14 @@ const Orchestrator = function () {
 	this.blocked = false;
 
 	this.init = function () {
+		this.botInterface = new BotInterface(this); // Abre a botInterface e aguarda usuário conectar com Bot
+	}
+
+	this.botConnected = function() {
 		this.gateway = new MBGateway(this);
 		this.analysisMachine = new AnalysisMachine(this);
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
-		//this.gateway.setupPriceUpdater(this.analysisMachine);
 		this.analysisMachine.fakePrice([1, 2, 3, 4, 6, 8, 9, 11, 13, 3, 5, 6, 7, 8, 9, 20]);
 	}
 
@@ -37,6 +41,7 @@ const Orchestrator = function () {
 	}
 
 	this.buyOrderChain = function (price) {
+		const self = this;
 		this.gateway.getBalance(function (err, data){
 			if (err){
 				console.log(`Error creating buy chain ${err}: ${JSON.stringify(err)}`);
@@ -49,7 +54,7 @@ const Orchestrator = function () {
 
 			//console.log(`Buying ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
 			
-			this.sendRequestForTrade({
+			self.sendRequestForTrade({
 				signal: process.env.SIGNAL_BUY,
 				coinPair: coinPair,
 				quantity: quantity,
@@ -60,18 +65,19 @@ const Orchestrator = function () {
 	}
 
 	this.sellOrderChain = function (price) {
+		const self = this;
 		this.gateway.getBalance(function (err, data){
 			if (err){
 				console.log(`Error creating sell chain ${err}: ${JSON.stringify(err)}`);
 			}
 			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
-			const balance = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available);
+			const quantity = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available);
 			const coinPair = `BRL${process.env.COIN}`;
 			const limitiPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
 
-			//console.log(`Selling ${balance} ${coinPair} at ${limitiPrice} for a total of ${(balance*limitiPrice).toFixed(2)}`);
+			//console.log(`Selling ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
 			
-			this.sendRequestForTrade({
+			self.sendRequestForTrade({
 				signal: process.env.SIGNAL_SELL,
 				coinPair: coinPair,
 				quantity: quantity,
@@ -83,6 +89,7 @@ const Orchestrator = function () {
 
 	this.sendRequestForTrade = function (order) {
 		console.log(JSON.stringify(order, null, 4));
+		this.botInterface.sendMessage(JSON.stringify(order));
 	}
 };
 
