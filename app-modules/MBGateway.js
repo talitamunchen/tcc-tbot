@@ -4,7 +4,8 @@
 const request = require("request");
 const APIInterface = require("./APIInterface");
 
-const Gateway = function() {
+const Gateway = function(orquestrator) {
+	this.orquestrator = orquestrator;
 
 	this.REQUEST_PRICE_URL = `https://www.mercadobitcoin.net/api/${process.env.COIN}/ticker/`;
 
@@ -94,8 +95,80 @@ const Gateway = function() {
 	};
 
 	this.executeOrder = function(orderData) {
+		const self = this;
+		//  create buy/sell order
 		console.log(JSON.stringify(orderData));
+		if (orderData.signal == process.env.SIGNAL_BUY){
+			console.log('Buying...');
+			this.createBuyOrder(orderData.coinPair, orderData.quantity, orderData.limitPrice, function (err, data){
+				if (err){
+					return console.log(`Error: ${JSON.stringify(err)}`);
+				}
+				
+				const orderId = data.response_data.order.order_id;
+				const createdTime = Number(data.response_data.order.created_timestamp)*1000; //transformando unix timestamp to milissegundos
+				const monitorInterval = Number(process.env.ORDER_MONITOR_INTERVAL);
+
+				setTimeout(function () {
+					self.monitorOrder(orderId, createdTime);
+				}, monitorInterval);
+			});
+		}else{
+			console.log('Selling...');
+			this.createSellOrder(orderData.coinPair, orderData.quantity, orderData.limitPrice, function (err, data){
+				if (err){
+					return console.log(`Error: ${JSON.stringify(err)}`);
+				}
+				
+				const orderId = data.response_data.order.order_id;
+				const createdTime = Number(data.response_data.order.created_timestamp)*1000; //transformando unix timestamp to milissegundos
+				const monitorInterval = Number(process.env.ORDER_MONITOR_INTERVAL);
+
+				setTimeout(function () {
+					self.monitorOrder(orderId, createdTime);
+				}, monitorInterval);
+			});
+		}
 	};
+
+	this.monitorOrder= function (orderId, createdTime) {
+		const self = this;
+		const coinPair = `BRL${process.env.COIN}`;
+
+		this.getOrder(coinPair, orderId, function (err, data) {
+			if (err){
+				return console.log(`Error: ${JSON.stringify(err)}`);
+			}
+			//console.log(JSON.stringify(data, null, 4));
+			
+			const orderStatus = data.response_data.order.status;
+			if (orderStatus == 4){ //order completed
+				self.orquestrator.orderCompleted();
+			}else if (orderStatus == 3){ //order cancelled
+				self.orquestrator.orderCancelled();
+			}else{ //2 order open
+				const timeoutTime = createdTime + Number(process.env.ORDER_MONITOR_TIMEOUT);
+				const now = new Date().getTime();
+
+				if (now > timeoutTime){
+					self.cancelOrder(coinPair, orderId, function (err, data){
+						self.orquestrator.orderTimeouted();
+						if (err){
+							return console.log(`Error: ${JSON.stringify(err)}`);
+						}
+						//console.log(JSON.stringify(data, null, 4));
+					});
+				}else{
+					const monitorInterval = Number(process.env.ORDER_MONITOR_INTERVAL);
+					//console.log('Not yet');
+
+					setTimeout(function () {
+						self.monitorOrder(orderId, createdTime);
+					}, monitorInterval);
+				}
+			}
+		});
+	}
 
 };
 

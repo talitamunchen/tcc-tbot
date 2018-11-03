@@ -23,7 +23,7 @@ const BotInterface = function (orquestrator){
             }, parse_mode: 'Markdown'
         };
         const signal = orderData.signal < 0 ? 'SELL':'BUY';
-        const message = `Hi, there is an opportunity for *${signal}*\nCoin: ${orderData.coinPair}\nAmount: ${orderData.quantity}\nPrice: ${orderData.limitPrice}`; 
+        const message = `Hi, there is an opportunity for *${signal}*\nCoin: ${orderData.coinPair}\nAmount: ${orderData.quantity}\nPrice: R$ ${(orderData.limitPrice).toFixed(2)}\nTotal: R$ ${(orderData.quantity*orderData.limitPrice).toFixed(2)}`; 
         this.bot.sendMessage(this.chatId, message, opts);
     }
 
@@ -39,6 +39,12 @@ const BotInterface = function (orquestrator){
         }
         this.orderData = null;
     });
+
+    this.sendGenericMessage = function (msg) {
+        this.bot.sendMessage(this.chatId, msg, {
+            parse_mode: 'Markdown'
+        });
+    }
 }
 
 
