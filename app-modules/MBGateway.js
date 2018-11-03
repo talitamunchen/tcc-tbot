@@ -93,6 +93,10 @@ const Gateway = function() {
 		APIInterface.postToMB(form, callback);
 	};
 
+	this.executeOrder = function(orderData) {
+		console.log(JSON.stringify(orderData));
+	};
+
 };
 
 module.exports = Gateway;

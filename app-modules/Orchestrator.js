@@ -21,14 +21,14 @@ const Orchestrator = function () {
 		this.analysisMachine = new AnalysisMachine(this);
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
-		this.analysisMachine.fakePrice([1, 2, 3, 4, 6, 8, 9, 11, 13, 3, 5, 6, 7, 8, 9, 20]);
+		this.analysisMachine.fakePrice([180, 179, 178, 175, 174, 174, 185, 195, 196, 199, 198, 190, 190]);
 	}
 
 	this.onSignal = function (signal, price) {
 		if (this.blocked){
 			return console.log(`Blocked, will not execute ${signal == process.env.SIGNAL_BUY ? "buy":"sell"}`);
 		}
-		//this.blocked = true;
+		this.blocked = true;
 		if (signal == process.env.SIGNAL_BUY){
 			this.buyOrderChain(price);
 		}else{
@@ -49,16 +49,16 @@ const Orchestrator = function () {
 			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
 			const balance = Number(Number(data.response_data.balance.brl.available).toFixed(2));
 			const coinPair = `BRL${process.env.COIN}`;
-			const limitiPrice = price * Number(process.env.BUY_SPREAD_MARGIN);
-			const quantity = Number(((Math.floor((balance/limitiPrice) * 1000000)) / 1000000).toFixed(6));
+			const limitPrice = price * Number(process.env.BUY_SPREAD_MARGIN);
+			const quantity = Number(((Math.floor((balance/limitPrice) * 1000000)) / 1000000).toFixed(6));
 
-			//console.log(`Buying ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
+			//console.log(`Buying ${quantity} ${coinPair} at ${limitPrice} for a total of ${(quantity*limitPrice).toFixed(2)}`);
 			
 			self.sendRequestForTrade({
 				signal: process.env.SIGNAL_BUY,
 				coinPair: coinPair,
 				quantity: quantity,
-				limitiPrice: limitiPrice
+				limitPrice: limitPrice
 				//graphic
 			});
 		});
@@ -73,23 +73,29 @@ const Orchestrator = function () {
 			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
 			const quantity = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available);
 			const coinPair = `BRL${process.env.COIN}`;
-			const limitiPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
+			const limitPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
 
-			//console.log(`Selling ${quantity} ${coinPair} at ${limitiPrice} for a total of ${(quantity*limitiPrice).toFixed(2)}`);
+			//console.log(`Selling ${quantity} ${coinPair} at ${limitPrice} for a total of ${(quantity*limitPrice).toFixed(2)}`);
 			
 			self.sendRequestForTrade({
 				signal: process.env.SIGNAL_SELL,
 				coinPair: coinPair,
 				quantity: quantity,
-				limitiPrice: limitiPrice
+				limitPrice: limitPrice
 				//graphic
 			});
 		});
 	}
 
-	this.sendRequestForTrade = function (order) {
-		console.log(JSON.stringify(order, null, 4));
-		this.botInterface.sendMessage(JSON.stringify(order));
+	this.sendRequestForTrade = function (orderData) {
+		this.botInterface.sendRequestOrder(orderData);
+	}
+
+	this.orderCallback = function (orderData) {
+		if (orderData == null){
+			return this.releaseBlock();
+		}
+		this.gateway.executeOrder(orderData);
 	}
 };
 

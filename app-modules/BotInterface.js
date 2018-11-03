@@ -14,14 +14,31 @@ const BotInterface = function (orquestrator){
         this.orquestrator.botConnected();
     });
   
-    this.sendMessage = function(msg) {
-        this.bot.sendMessage(this.chatId, msg, {
-            "reply_markup": {
-                "keyboard": [["Autorizado!", "Negadio!"]]
-            }
-        });
+    this.sendRequestOrder = function(orderData) {
+        this.orderData = orderData;
+        const opts = {
+            reply_markup: {
+                inline_keyboard: [[{text: 'Do it!', callback_data: 'yes'}, {text: 'No, thanks!', callback_data: 'no'}]],
+                resize_keyboard: true
+            }, parse_mode: 'Markdown'
+        };
+        const signal = orderData.signal < 0 ? 'SELL':'BUY';
+        const message = `Hi, there is an opportunity for *${signal}*\nCoin: ${orderData.coinPair}\nAmount: ${orderData.quantity}\nPrice: ${orderData.limitPrice}`; 
+        this.bot.sendMessage(this.chatId, message, opts);
     }
-    
+
+    this.bot.on('callback_query', (query) => {
+        const action = query.data;
+        const msg = query.message;
+        if (query.data == 'yes'){
+            this.bot.sendMessage(this.chatId, 'Sending order...');
+            this.orquestrator.orderCallback(this.orderData);
+        }else{
+            this.bot.sendMessage(this.chatId, 'Order discarted!');
+            this.orquestrator.orderCallback(null);
+        }
+        this.orderData = null;
+    });
 }
 
 
