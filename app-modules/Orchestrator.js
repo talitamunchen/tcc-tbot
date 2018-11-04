@@ -7,8 +7,6 @@ const SimpleMovingAverage = require('./indicators/SimpleMovingAverage');
 const MBGateway = require('./MBGateway');
 const BotInterface = require('./BotInterface');
 
-//mbGateway.setupPriceUpdater(analysisMachine);
-
 const Orchestrator = function () {
 	this.blocked = false;
 
@@ -21,7 +19,7 @@ const Orchestrator = function () {
 		this.analysisMachine = new AnalysisMachine(this);
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
-		//this.analysisMachine.fakePrice([180, 179, 178, 175, 174, 174, 185, 195, 196, 199, 198, 190, 190]);
+		this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
 		//this.analysisMachine.fakePrice([170, 171, 170]);
 	}
 

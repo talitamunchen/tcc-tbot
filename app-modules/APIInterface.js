@@ -17,12 +17,6 @@ postToMB : function(form, callback) {
 			}
 			form.tapi_nonce = nonce;
 
-			// Teste - Fazer os tests com o bot
-			if(process.env.DRY_RUN && process.env.DRY_RUN == 'true') {
-				console.log(`DRY RUN. Posting to MercadoBitcoin: ${JSON.stringify(form, null, 4)}`);
-				return callback(null,{status_code: 100, dryRun: true});
-			}
-
 			// Hash das informacoes para garantia de integridade
 			let path = '/tapi/v3/';
 			let formData = querystring.stringify(form);
