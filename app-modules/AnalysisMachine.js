@@ -1,7 +1,7 @@
 //Maquina de analise
-const AnalysisMachine = function (orquestrator) {
+const AnalysisMachine = function (orchestrator) {
 
-    this.orquestrator = orquestrator;
+    this.orchestrator = orchestrator;
     this.indicators = [];
     
     this.priceUpdated = function (price) {
@@ -10,7 +10,7 @@ const AnalysisMachine = function (orquestrator) {
             const indicator = this.indicators[i];
             const signal = indicator.indicatorSignal(price);
             if (signal){
-               return this.orquestrator.onSignal(signal, price);
+               return this.orchestrator.onSignal(signal, price);
             }
         }
 	}

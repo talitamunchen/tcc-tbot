@@ -4,8 +4,8 @@
 const request = require("request");
 const APIInterface = require("./APIInterface");
 
-const Gateway = function(orquestrator) {
-	this.orquestrator = orquestrator;
+const Gateway = function(orchestrator) {
+	this.orchestrator = orchestrator;
 
 	this.REQUEST_PRICE_URL = `https://www.mercadobitcoin.net/api/${process.env.COIN}/ticker/`;
 
@@ -143,16 +143,16 @@ const Gateway = function(orquestrator) {
 			
 			const orderStatus = data.response_data.order.status;
 			if (orderStatus == 4){ //order completed
-				self.orquestrator.orderCompleted();
+				self.orchestrator.orderCompleted();
 			}else if (orderStatus == 3){ //order cancelled
-				self.orquestrator.orderCancelled();
+				self.orchestrator.orderCancelled();
 			}else{ //2 order open
 				const timeoutTime = createdTime + Number(process.env.ORDER_MONITOR_TIMEOUT);
 				const now = new Date().getTime();
 
 				if (now > timeoutTime){
 					self.cancelOrder(coinPair, orderId, function (err, data){
-						self.orquestrator.orderTimeouted();
+						self.orchestrator.orderTimeouted();
 						if (err){
 							return console.log(`Error: ${JSON.stringify(err)}`);
 						}
