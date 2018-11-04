@@ -27,6 +27,17 @@ const Orchestrator = function () {
 		this.gateway.cancelAllOrders();
 	}
 
+	this.requestBalance = function () {
+		const self = this;
+		this.gateway.getBalance(function (err, data){
+			if (err){
+				return self.botInterface.sendGenericMessage(`Error looking for balance.`);
+			}
+			const msg = `Balance\nR$ ${data.response_data.balance.brl.total}\n${process.env.COIN} ${data.response_data.balance[process.env.COIN.toLowerCase()].total}`;
+			self.botInterface.sendGenericMessage(msg);
+		});
+	}
+
 	this.onSignal = function (signal, price) {
 		if (this.blocked){
 			return console.log(`Blocked, will not execute ${signal == process.env.SIGNAL_BUY ? "buy":"sell"}`);

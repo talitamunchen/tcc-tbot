@@ -19,6 +19,10 @@ const BotInterface = function (orchestrator){
         this.bot.sendMessage(this.chatId, "Cancelling all pending orders!");
         this.orchestrator.cancelAllOrders();
     });
+
+    this.bot.onText(/\/balance.*/, (msg, match) => {
+        this.orchestrator.requestBalance();
+    });
   
     this.sendRequestOrder = function(orderData) {
         this.orderData = orderData;
