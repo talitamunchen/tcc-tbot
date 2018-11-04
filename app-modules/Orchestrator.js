@@ -20,7 +20,7 @@ const Orchestrator = function () {
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
 		//this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
-		//this.analysisMachine.fakePrice([180, 179, 180]);
+		this.analysisMachine.fakePrice([190, 191, 190]);
 	}
 
 	this.cancelAllOrders = function () {
@@ -67,14 +67,25 @@ const Orchestrator = function () {
 			const quantity = Number(((Math.floor((balance/limitPrice) * 1000000)) / 1000000).toFixed(6));
 
 			//console.log(`Buying ${quantity} ${coinPair} at ${limitPrice} for a total of ${(quantity*limitPrice).toFixed(2)}`);
+			const orderVolume = quantity * limitPrice;
+
+			const minVolume = Number(process.env.MIN_BRL_BALANCE_TO_BUY);
+
+			if (balance < minVolume){
+				self.botInterface.sendGenericMessage(`Can't buy, min balance of R$ ${minVolume} and have R$ ${data.response_data.balance.brl.available}`);
+			}else if (orderVolume < minVolume) {
+				self.botInterface.sendGenericMessage(`Can't buy, min volume of R$ ${process.env.MIN_BRL_BALANCE_TO_BUY} and order of R$ ${orderVolume}`);
+			}else{
+				self.sendRequestForTrade({
+					signal: process.env.SIGNAL_BUY,
+					coinPair: coinPair,
+					quantity: quantity,
+					limitPrice: limitPrice
+					//graphic
+				});
+			}
+
 			
-			self.sendRequestForTrade({
-				signal: process.env.SIGNAL_BUY,
-				coinPair: coinPair,
-				quantity: quantity,
-				limitPrice: limitPrice
-				//graphic
-			});
 		});
 	}
 
@@ -85,19 +96,28 @@ const Orchestrator = function () {
 				console.log(`Error creating sell chain ${err}: ${JSON.stringify(err)}`);
 			}
 			//console.log(`Data ${JSON.stringify(data, null, 4)}`);
-			const quantity = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available)*(process.env.SELL_AMOUNT); //vende X% do disponivel
+			const balance = Number(data.response_data.balance[process.env.COIN.toLocaleLowerCase()].available);
+			const quantity = balance * (process.env.SELL_AMOUNT); //vende X% do disponivel
 			const coinPair = `BRL${process.env.COIN}`;
 			const limitPrice = price * Number(process.env.SELL_SPREAD_MARGIN);
 
 			//console.log(`Selling ${quantity} ${coinPair} at ${limitPrice} for a total of ${(quantity*limitPrice).toFixed(2)}`);
 			
-			self.sendRequestForTrade({
-				signal: process.env.SIGNAL_SELL,
-				coinPair: coinPair,
-				quantity: quantity,
-				limitPrice: limitPrice
-				//graphic
-			});
+			const minVolume = process.env.MIN_COIN_BALANCE_TO_SELL;
+
+			if (balance < minVolume){
+				self.botInterface.sendGenericMessage(`Can't sell, min balance of ${process.env.COIN} ${minVolume} and have R$ ${balance}`);
+			}else if (quantity < minVolume){
+				self.botInterface.sendGenericMessage(`Can't sell, min volume of ${process.env.COIN} ${minVolume} and order of R$ ${quantity}`);	
+			}else{
+				self.sendRequestForTrade({
+					signal: process.env.SIGNAL_SELL,
+					coinPair: coinPair,
+					quantity: quantity,
+					limitPrice: limitPrice
+					//graphic
+				});
+			}
 		});
 	}
 
