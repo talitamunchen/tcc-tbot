@@ -13,6 +13,12 @@ const BotInterface = function (orchestrator){
         this.bot.sendMessage(this.chatId, "Bot connected!");
         this.orchestrator.botConnected();
     });
+
+    this.bot.onText(/\/cancel.*/, (msg, match) => {
+        this.chatId = msg.chat.id;
+        this.bot.sendMessage(this.chatId, "Cancelling all pending orders!");
+        this.orchestrator.cancelAllOrders();
+    });
   
     this.sendRequestOrder = function(orderData) {
         this.orderData = orderData;

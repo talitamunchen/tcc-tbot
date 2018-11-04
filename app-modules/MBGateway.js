@@ -72,6 +72,25 @@ const Gateway = function(orchestrator) {
 		APIInterface.postToMB(form, callback);
 	};
 
+	this.cancelAllOrders = function() {
+		const self = this;
+		const coinPair = `BRL${process.env.COIN}`;
+		this.listOrders(coinPair, function (err, data){
+			if (err){
+				return console.log(`Error: ${JSON.stringify(err)}`);
+			}
+			
+			data.response_data.orders.forEach(order => {
+				self.cancelOrder(coinPair, order.order_id, function (err, data){
+					if (err){
+						return console.log(`Error: ${JSON.stringify(err)}`);
+					}
+					//success, orders cancelada!
+				})
+			});
+		});
+	}
+
 	this.createBuyOrder = function(coinPair, quantity, limitPrice, callback) {
 		const form = {
 			'tapi_method': 'place_buy_order',

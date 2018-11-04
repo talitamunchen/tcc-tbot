@@ -14,13 +14,17 @@ const Orchestrator = function () {
 		this.botInterface = new BotInterface(this); // Abre a botInterface e aguarda usuário conectar com Bot
 	}
 
-	this.botConnected = function() {
+	this.botConnected = function () {
 		this.gateway = new MBGateway(this);
 		this.analysisMachine = new AnalysisMachine(this);
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
-		this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
-		//this.analysisMachine.fakePrice([170, 171, 170]);
+		//this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
+		//this.analysisMachine.fakePrice([180, 179, 180]);
+	}
+
+	this.cancelAllOrders = function () {
+		this.gateway.cancelAllOrders();
 	}
 
 	this.onSignal = function (signal, price) {
