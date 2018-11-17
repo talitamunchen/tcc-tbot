@@ -5,13 +5,15 @@ const AnalysisMachine = function (orchestrator) {
     this.indicators = [];
     
     this.priceUpdated = function (price) {
+        const self = this;
         console.log(`New price = ${price}`);
         for(let i = 0; i < this.indicators.length; i++){
             const indicator = this.indicators[i];
-            const signal = indicator.indicatorSignal(price);
-            if (signal){
-               return this.orchestrator.onSignal(signal, price);
-            }
+            indicator.indicatorSignal(price, function (signalData){
+                if (signalData){
+                    return self.orchestrator.onSignal(signalData.signal, signalData.price);
+                 }
+            });
         }
 	}
 

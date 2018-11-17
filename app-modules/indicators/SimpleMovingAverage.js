@@ -8,10 +8,10 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
     this.CROSS_LOW = -1;
 
     //Assimila um novo preco > executa algoritmo > emite sinal
-    this.indicatorSignal = function (price){
+    this.indicatorSignal = function (price, callback){
         this.prices.push(price);
         if (this.prices.length < trendPeriod){ //nao ha valores suficientes?
-            return null; //nenhum sinal
+            return callback(null); //nenhum sinal
         }else if (this.prices.length > trendPeriod){ //ha valores demais?
             this.prices.shift(); //remove o mais antigo
         }
@@ -25,15 +25,19 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
         //console.log(`${trendAverage} - ${signalAverage}`);
 
         if (trendAverage == signalAverage){
-            return null; //nenhum sinal
+            return callback(null); //nenhum sinal
         }else{
             const cross = (signalAverage > trendAverage) ? this.CROSS_HIGH:this.CROSS_LOW;
             if (this.lastCross && this.lastCross != cross){
                 this.lastCross = cross;
-                return (cross == this.CROSS_HIGH) ? process.env.SIGNAL_BUY:process.env.SIGNAL_SELL; //1 = buy and -1 = sell
+                const signal = (cross == this.CROSS_HIGH) ? process.env.SIGNAL_BUY:process.env.SIGNAL_SELL; //1 = buy and -1 = sell
+                return callback ({
+                    signal: signal, //compra ou venda
+                    price: price //ultimo preco, preco que disparou o sinal
+                });
             }else{
                 this.lastCross = cross;
-                return null;
+                return callback(null);
             }
         }
     }
