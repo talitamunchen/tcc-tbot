@@ -20,7 +20,8 @@ const Orchestrator = function () {
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
 		//this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
-		this.analysisMachine.fakePrice([190, 189, 190]);
+		//this.analysisMachine.fakePrice([180, 181, 183, 184, 185, 186, 187, 188, 189, 190, 191, 190]);
+		this.analysisMachine.fakePrice([190, 189, 188, 187, 186, 185, 184, 183, 182, 181, 180, 179, 185, 186]);
 	}
 
 	this.cancelAllOrders = function () {

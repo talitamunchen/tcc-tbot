@@ -32,7 +32,7 @@ const AnalysisMachine = function (orchestrator) {
         if (arr.length > 0){
             setTimeout(() => {
                 self.fakePrice(arr);
-            }, 1000);
+            }, 200);
         }
     }
 };
