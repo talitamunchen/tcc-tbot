@@ -20,7 +20,7 @@ const Orchestrator = function () {
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
 
 		//this.gateway.setupPriceUpdater(this.analysisMachine); //update dos precos de mercado
-		this.analysisMachine.fakePrice([190, 191, 190]);
+		this.analysisMachine.fakePrice([190, 189, 190]);
 	}
 
 	this.cancelAllOrders = function () {
@@ -38,15 +38,15 @@ const Orchestrator = function () {
 		});
 	}
 
-	this.onSignal = function (signal, price) {
+	this.onSignal = function (signal, price, chartData) {
 		if (this.blocked){
 			return console.log(`Blocked, will not execute ${signal == process.env.SIGNAL_BUY ? "buy":"sell"}`);
 		}
 		this.blocked = true;
 		if (signal == process.env.SIGNAL_BUY){
-			this.buyOrderChain(price);
+			this.buyOrderChain(price, chartData);
 		}else{
-			this.sellOrderChain(price);
+			this.sellOrderChain(price, chartData);
 		}
 	}
 
@@ -54,7 +54,7 @@ const Orchestrator = function () {
 		this.blocked = false;
 	}
 
-	this.buyOrderChain = function (price) {
+	this.buyOrderChain = function (price, chartData) {
 		const self = this;
 		this.gateway.getBalance(function (err, data){
 			if (err){
@@ -80,8 +80,8 @@ const Orchestrator = function () {
 					signal: process.env.SIGNAL_BUY,
 					coinPair: coinPair,
 					quantity: quantity,
-					limitPrice: limitPrice
-					//graphic
+					limitPrice: limitPrice,
+					chartData: chartData
 				});
 			}
 
@@ -89,7 +89,7 @@ const Orchestrator = function () {
 		});
 	}
 
-	this.sellOrderChain = function (price) {
+	this.sellOrderChain = function (price, chartData) {
 		const self = this;
 		this.gateway.getBalance(function (err, data){
 			if (err){
@@ -114,8 +114,8 @@ const Orchestrator = function () {
 					signal: process.env.SIGNAL_SELL,
 					coinPair: coinPair,
 					quantity: quantity,
-					limitPrice: limitPrice
-					//graphic
+					limitPrice: limitPrice, 
+					chartData: chartData
 				});
 			}
 		});

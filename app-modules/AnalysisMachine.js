@@ -11,7 +11,7 @@ const AnalysisMachine = function (orchestrator) {
             const indicator = this.indicators[i];
             indicator.indicatorSignal(price, function (signalData){
                 if (signalData){
-                    return self.orchestrator.onSignal(signalData.signal, signalData.price);
+                    return self.orchestrator.onSignal(signalData.signal, signalData.price, signalData.chartData);
                  }
             });
         }

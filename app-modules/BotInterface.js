@@ -35,6 +35,13 @@ const BotInterface = function (orchestrator){
         const signal = orderData.signal < 0 ? 'SELL':'BUY';
         const message = `Hi, there is an opportunity for *${signal}*\nCoin: ${orderData.coinPair}\nAmount: ${orderData.quantity}\nPrice: R$ ${(orderData.limitPrice).toFixed(2)}\nTotal: R$ ${(orderData.quantity*orderData.limitPrice).toFixed(2)}`; 
         this.bot.sendMessage(this.chatId, message, opts);
+        if (orderData.chartData){
+            const fileOpts = {
+                filename : 'chart',
+                contentType : 'image/png'
+            }
+            this.bot.sendPhoto(this.chatId, orderData.chartData, {}, fileOpts);
+        }
     }
 
     this.bot.on('callback_query', (query) => {
