@@ -1,0 +1,1 @@
+docker container prune -f ; docker image rm -f tcc-talita ; docker build -t tcc-talita . ; docker run tcc-talita

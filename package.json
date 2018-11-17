@@ -19,6 +19,8 @@
     "node-telegram-bot-api": "^0.30.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
-    "telegraf": "^3.24.1"
+    "telegraf": "^3.24.1",
+    "chart.js": "2.7.3",
+    "chartjs-node": "1.7.1"
   }
 }
