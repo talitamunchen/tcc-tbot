@@ -1,4 +1,3 @@
-const ChartjsNode = require('chartjs-node');
 const fs = require('fs');
 
 const SimpleMovingAverage = function (trendPeriod, signalPeriod){
@@ -15,29 +14,38 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
     //Assimila um novo preco > executa algoritmo > emite sinal
     this.indicatorSignal = function (price, callback){
         this.prices.push(price);
-        if (this.prices.length < trendPeriod){ //nao ha valores suficientes?
-            this.trendArray.push(null);
-            this.signalArray.push(null);
-            if (this.trendArray.length > trendPeriod){
-                this.trendArray.shift();
+        if(this.prices.length > trendPeriod) {
+            this.prices.shift();
+        }
+        
+        let signalAverage;
+        if(this.prices.length >= signalPeriod) {
+            const signalPrices = this.prices.slice(this.prices.length - signalPeriod); //
+            signalAverage = this.calcAverage(signalPrices); //sinal
+            this.signalArray.push(signalAverage);
+            if(this.signalArray.length > trendPeriod) {
                 this.signalArray.shift();
             }
+        } else {
+            this.signalArray.push(null);
+        }
+
+        let trendAverage;
+        if (this.prices.length < trendPeriod){ //nao ha valores suficientes?
+            this.trendArray.push(null);
+            if (this.trendArray.length > trendPeriod){
+                this.trendArray.shift();
+            }
             return callback(null); //nenhum sinal
-        }else if (this.prices.length > trendPeriod){ //ha valores demais?
-            this.prices.shift(); //remove o mais antigo
         }
 
         //calcula medias
-        const signalPrices = this.prices.slice(trendPeriod - signalPeriod); //
-        const trendAverage = this.calcAverage(this.prices); //tendencia, tem a media de todods os pre;os
-        const signalAverage = this.calcAverage(signalPrices); //sinal
+        trendAverage = this.calcAverage(this.prices); //tendencia, tem a media de todods os pre;os
+        
 
         this.trendArray.push(trendAverage);
-        this.signalArray.push(signalAverage);
-
         if (this.trendArray.length > trendPeriod){
             this.trendArray.shift();
-            this.signalArray.shift();
         }
 
         //console.log(`${JSON.stringify(this.prices)} - ${JSON.stringify(signalPrices)}`);
@@ -73,14 +81,19 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
     }
 
     this.createChart = function (callback) {
+        if(!process.env.CHART_ENABLED || process.env.CHART_ENABLED == "false") {
+            return callback(null);
+        }
+
         const self = this;
+        const ChartjsNode = require('chartjs-node');
         const chartNode = new ChartjsNode(600, 600);
-        console.log(`chart data: ${self.prices}`);
+        
         const labels = [];
         for (let i = 0; i < self.prices.length; i++){
             labels.push(`t${i}`);
         }
-        console.log(`labels ${labels}`);
+        
         return chartNode.drawChart({
             // The type of chart we want to create
             type: 'line',

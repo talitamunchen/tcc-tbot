@@ -23,6 +23,20 @@ const BotInterface = function (orchestrator){
     this.bot.onText(/\/balance.*/, (msg, match) => {
         this.orchestrator.requestBalance();
     });
+
+    this.bot.onText(/\/fakebuy (.+)/, (msg, match) => {
+        this.chatId = msg.chat.id;
+        const target = Number(match[1]); // target
+        this.bot.sendMessage(this.chatId, `Creating fake prices to buy at ${target.toFixed(2)}...`);
+        this.orchestrator.createFakeBuyPrices(target);
+    });
+
+    this.bot.onText(/\/fakesell (.+)/, (msg, match) => {
+        this.chatId = msg.chat.id;
+        const target = Number(match[1]); // target
+        this.bot.sendMessage(this.chatId, `Creating fake prices to sell at ${target.toFixed(2)}...`);
+        this.orchestrator.createFakeSellPrices(target);
+    });
   
     this.sendRequestOrder = function(orderData) {
         this.orderData = orderData;
