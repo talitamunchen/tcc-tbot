@@ -15,9 +15,11 @@ const Orchestrator = function () {
 	}
 
 	this.botConnected = function () {
+		console.log('Bot connected. Pulling data from market...');
 		this.gateway = new MBGateway(this);
 		this.analysisMachine = new AnalysisMachine(this);
 		this.analysisMachine.installIndicator(new SimpleMovingAverage(Number(process.env.TREND_PERIOD), Number(process.env.SIGNAL_PERIOD)));
+		//this.gateway.setupPriceUpdater(this.analysisMachine);
 	}
 
 	this.createFakeBuyPrices = function(target) {
