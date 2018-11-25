@@ -1,4 +1,4 @@
-FROM base-tcc:latest
+FROM talitamunchen/base-tcc:lastest
 
 WORKDIR /app
 COPY . /app

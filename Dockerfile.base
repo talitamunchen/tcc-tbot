@@ -1,0 +1,14 @@
+FROM ubuntu:16.04
+
+RUN apt-get update --fix-missing
+RUN apt-get install -y curl
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN apt-get update
+
+RUN apt-get install -y build-essential nodejs libcairo2 libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libpng-dev
+
+WORKDIR /app
+COPY package.json /app
+RUN npm install
+#ENTRYPOINT node index.js

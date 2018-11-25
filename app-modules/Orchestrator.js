@@ -59,6 +59,7 @@ const Orchestrator = function () {
 
 	this.onSignal = function (signal, price, chartData) {
 		if (this.blocked){
+			this.botInterface.sendGenericMessage(`Blocked by another pending order.`);
 			return console.log(`Blocked, will not execute ${signal == process.env.SIGNAL_BUY ? "buy":"sell"}`);
 		}
 		this.blocked = true;
