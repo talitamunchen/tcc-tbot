@@ -80,6 +80,13 @@ const SimpleMovingAverage = function (trendPeriod, signalPeriod){
         return sum/arr.length;
     }
 
+    this.clearData = function () {
+        this.prices = [];
+        this.trendArray = [];
+        this.signalArray = [];
+        this.lastCross = null;
+    }
+
     this.createChart = function (callback) {
         if(!process.env.CHART_ENABLED || process.env.CHART_ENABLED == "false") {
             return callback(null);

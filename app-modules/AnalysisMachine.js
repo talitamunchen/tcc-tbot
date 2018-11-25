@@ -35,6 +35,13 @@ const AnalysisMachine = function (orchestrator) {
             }, 200);
         }
     }
+
+    this.clearData = function () {
+        for(let i = 0; i < this.indicators.length; i++){
+            const indicator = this.indicators[i];
+            indicator.clearData(); //limpando dados de indicadores para simulação
+        }
+    }
 };
 
 module.exports = AnalysisMachine;

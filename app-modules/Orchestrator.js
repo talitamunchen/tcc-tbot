@@ -28,6 +28,7 @@ const Orchestrator = function () {
 		fakePrices.push(target -1);
 		fakePrices.push(target);
 		fakePrices.push(target + 1);
+		this.analysisMachine.clearData();
 		this.analysisMachine.fakePrice(fakePrices);
 	}
 
@@ -39,6 +40,7 @@ const Orchestrator = function () {
 		fakePrices.push(target + 1);
 		fakePrices.push(target + 0);
 		fakePrices.push(target - 1);
+		this.analysisMachine.clearData();
 		this.analysisMachine.fakePrice(fakePrices);
 	}
 
