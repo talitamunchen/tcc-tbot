@@ -26,6 +26,7 @@
     
 7.  aguarde os sinais
 
+
 **Comandos do bot**
 
 - **/start**: inicia a aplicação
